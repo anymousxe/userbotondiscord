@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Run: deno run --allow-net --allow-env bot.ts
 import { Client } from "npm:discord.js-selfbot-v13";
 
@@ -6,27 +7,23 @@ const token = Deno.env.get("USER_TOKEN");
 const API_URL = "http://localhost:3000/api/chat"; 
 
 client.on("ready", () => {
-  console.log(`✅ No cap, ${client.user?.tag} is now live and listening.`);
+  console.log(`✅ Logged in as ${client.user?.tag}. We really out here.`);
 });
 
 client.on("messageCreate", async (msg) => {
-  // 67 mango stuff - ignore other bots and your own messages to prevent loops
+  // 67 mango stuff - don't reply to bots or yourself
   if (msg.author.bot || msg.author.id === client.user?.id) return;
 
-  // Only trigger if you're actually pinged
+  // Only trigger if you're pinged
   if (!msg.mentions.has(client.user!)) return;
 
-  // Clean the ping out of the string
   const prompt = msg.content.replace(/<@!?\d+>/g, "").trim();
   if (!prompt) return;
 
-  console.log(`Input received: ${prompt}`);
-
   try {
-    // Show that "typing..." status so it looks like a real human
     await msg.channel.sendTyping();
 
-    // Call your Next.js API route
+    // diddy blud functions - calling the Next.js API
     const res = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -34,11 +31,9 @@ client.on("messageCreate", async (msg) => {
     });
 
     const data = await res.json();
-
-    // diddy blud functions - reply to the ping with the AI text
     await msg.reply(data.text);
   } catch (err) {
-    console.error("Bot is tweaking:", err);
+    console.error("Bot logic is cooked:", err);
   }
 });
 
